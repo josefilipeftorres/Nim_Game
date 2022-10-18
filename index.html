@@ -4,56 +4,150 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nim game</title>
-    <link rel="stylesheet" href="stylesheet.css" 
-    <script src="game.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nim game</title> 
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 
-    <body>
-        <div id="logo">
-            <img src="cold, smooth & tasty..png" alt="logo">
+<body>
+
+    <!-- Header -->
+    <section id="header">
+        <div class="header container">
+          <div class="nav-bar">
+            <div class="brand">
+              <a href="#intro">
+                <h1>N<span>!</span>M</h1>
+              </a>
+            </div>
+            <div class="nav-list">
+                <ul>
+                    <li><a href="#intro"><button class="buttonHead" type="button">Home</button></a></li>
+                    <li><a href="#rules"> <button class="buttonHead" type="button">Rules</button></a></li>
+                    <li><a href="#configuration"><button class="buttonHead" type="button">Configuration</button></a></li>
+                    <li><button class="buttonHead" id="buttonOUT" role="button" onclick="logOUT()">Leave</button></li>
+                </ul>
+            </div>
+          </div>
         </div>
-    </body>
+      </section>
+    <!-- End Header -->
 
+    <!-- Intro Section -->
+    <section id="intro">
+        <div class="intro container">
+            <div class="logo">
+                <img src="cold, smooth & tasty..png" alt="logo" />
+            </div>
+            <div class="apr">
+                <h1>Welcome to<span></span></h1>
+                <h1 class="hover-underline">N!M Game<span></span></h1>
+                <button class="button" id="buttonIN" role="button" onclick="logIN()">Log In</button>
+                <a href="#rules"><button class="button" id="buttonCont" role="button">Continue</button></a>
+                <div id="logResult"></div>
+            </div>
+        </div>
+    </section>
+    <!-- End Intro Section -->
 
-    <form>
-        <input type="radio" name="difficulty">
-        <label for="easy">Easy</label>
-        <input type="radio" name="difficulty">
-        <label for="intermediate">Intermediate</label>
-        <input type="radio" name="difficulty">
-        <label for="hard">Hard</label>
-    </form>
-
-    <form>
-        <input type="radio" name="opponent">
-        <label for="singleplayer">Single Player</label>
-        <input type="radio" name="opponent">
-        <label for="multiplayer">Multiplayer</label>
-    </form>
-
-    <form>
-        <input type="radio" name="player1">
-        <label for="userplays">User</label>
-        <input type="radio" name="player1">
-        <label for="computerplays">Computer</label>
-    </form>
-
-    <form>
-        <input type="radio" name="sizing">
-        <label for="4rows">4 Rows</label>
-        <input type="radio" name="sizing">
-        <label for="6rows">6 Rows</label>
-        <input type="radio" name="sizing">
-        <label for="8rows">8 Rows</label>
-    </form>
-
-
-
-
+    <!-- Contents Section -->
+    <section id="rules">
+        <div class="rules container">
+            <div class="rulesText">
+                <ul>
+                    <li>O Nim é um jogo matemático de estratégia em que dois jogadores alternadamente removem objetos (contas, grãos, fosforos) de diferentes pilhas.</li>
+                    <li>A cada jogada, o jogador deve remover pelo menos um objeto de um pilha e todos os objetos removidos devem pertencer à mesma pilha.</li>
+                    <li>O objetivo do jogo é remover o último objeto.</li>
+                    <li>(Alternativamente, o objetivo pode ser evitar tirar o último objeto - "à lá misére").</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <!-- End Contents Section -->
     
+    <section id="configuration">
+        <div class="configuration container">
+            <form action="" method="post" id="myForm">
+                <!-- GAME DIFFICULTY -->
+                <h1>Choose the difficulty</h1>
+                <label>
+                    <input type="radio" id="easyMode" name="mode" checked>
+                    Easy
+                </label>
+                <label>
+                    <input type="radio" id="interMode" name="mode">
+                    Intermediate
+                </label>
+                <label>
+                    <input type="radio" id="hardMode" name="mode">
+                    Hard
+                </label>
 
+                <!-- GAME VS -->
+                <h1>Choose the opponent</h1>
+                <label>
+                    <input type="radio" id="singlePlayer" name="opponent" checked>
+                    Singleplayer
+                </label>
+                <label>
+                    <input type="radio" id="multiPlayer" name="opponent">
+                    Multiplayer
+                </label>
+                
+                <!-- GAME STARTING -->
+                <h1>Choose who starts</h1>
+                <p>(If you play singleplayer)</p>
+                <label>
+                    <input type="radio" id="userStart" name="start">
+                    User
+                </label>
+                <label>
+                    <input type="radio" id="pcStart" name="start" checked>
+                    Computer
+                </label>
+                                
+                <!-- GAME SIZE -->
+                <h1>Choose the size of the board</h1>
+                <label>
+                    <input type="radio" id="size4" name="size" checked>
+                    4 Rows
+                </label>
+                <label>
+                    <input type="radio" id="size6" name="size">
+                    6 Rows
+                </label>
+                <label>
+                    <input type="radio" id="size8" name="size">
+                    8 Rows
+                </label>
+                <br>
+                <a href="#game"><button class="button" type="button" onclick="saveData()">Submit</button></a>
+            </form>
+            <div id="popRules">
+                asad
+            </div> 
+        </section>
 
+        <section id="game">
+            <div class="game container">
+                <div class="showGame">
+                        Row 1 O <br>
+                        Row 2 O O <br>
+                        Row 3 O O O O <br>
+                        Row 4 O O O O O O <br>
+                        Row 5 O O O O O O O O <br>
+                        Row 6 O O O O O O O O O O <br>
+                        Row 7 O O O O O O O O O O O O <br>
+                        Row 8 O O O O O O O O O O O O O O <br>
+                </div>
+            </div>
+        </section>
+
+        <section id="gameStats">
+            <div class="gameStats container">
+            </div>
+        </section>
+
+</body>
+<script src="game.js"></script>
 </html>
