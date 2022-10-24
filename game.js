@@ -187,17 +187,16 @@ class createBoardGame {
             this.boardPlace = document.createElement("div");
             this.boardPlace.className = "boardDiv";
             this.boardPlace.id = "boardDiv";
-            this.boardPlace.style.width = "" + (90 * this.xSide) + "px";
             document.getElementById("showGame").appendChild(this.boardPlace);
 
             for (var i = 0; i < this.ySide; i++) {
                 this.boardPieces.push(i + 1);
                 var tempDiv = document.createElement("div");
-                tempDiv.id = "cellDiv" + i;
-                tempDiv.className = "cellDiv";
+                tempDiv.id = "rowDiv" + i;
+                tempDiv.className = "rowDiv";
                 for (var j = i; j >= 0; j--) {
                     var piece = new Piece(i, j);
-                    tempDiv.appendChild(piece.html);
+                    tempDiv.appendChild(piece.pieceNewDiv);
                 }
                 this.boardPlace.appendChild(tempDiv);
             }
@@ -235,15 +234,16 @@ class nimGame {
             this.changeGameMessages();
 
             if (this.firstPlayer == "pc") {
-                // setTimeout(function() {this.pc.move(); }, 1500);
-                setTimeout(() => { this.pc.move(); }, 2000);
+                // setTimeout(function() {this.pc.play(); }, 1500);
+                setTimeout(() => { this.pc.play(); }, 2000);
                 // this.firstPlayer = "player";
                 // console.log("O BACANO ESTÁ A JOGAR SOZINHO ?????");
                 // console.log("Posso jogar agora??");
             }
         };
+
         this.changeGameMessages = function () {
-            if ((this.moves % 2 == 0 && this.firstPlayer == "player") || (this.moves % 2 != 0 && this.firstPlayer != "player")) {
+            if (gameTurn(this.moves, this.firstPlayer) == "player") {
                 // if (this.firstPlayer == "player") {
                 document.getElementById("gameMessages").innerHTML = "<h1>" + username + "'s turn</h1>";
             }
@@ -253,8 +253,13 @@ class nimGame {
         };
 
         this.deletePiece = function (x, y) {
-            for (var i = y; i < this.board.boardPieces[x]; i++)
-                document.getElementById("piece" + x + "|" + i).className = "pieceDeleted";
+            for (var i = y; i < this.board.boardPieces[x]; i++) {
+                // var toBeDeleted = document.getElementById("piece x-" + x + " y:" + i);
+                // toBeDeleted.className = "pieceDeleted";
+                // toBeDeleted.style.visibility = "hidden";
+                document.getElementById("piece x-" + x + "y:" + i).className = "pieceDeleted";
+                // document.getElementById("piece x-" + x + " y:" + i).style.visibility = "hidden";
+            }
 
             this.board.boardPieces[x] = y;
 
@@ -267,11 +272,11 @@ class nimGame {
 
             if (gamePlaying == true) this.changeGameMessages();
 
-            if ((this.moves % 2 == 0 && this.firstPlayer == "pc") || (this.moves % 2 != 0 && this.firstPlayer != "pc")) {
+            if (gameTurn(this.moves, this.firstPlayer) == "pc") {
                 // console.log("pc move TESTE");
                 // if (this.firstPlayer == "pc") {
                 // console.log("pc move TESTE AFTER IF");
-                setTimeout(() => { this.pc.move(); }, 2000);
+                setTimeout(() => { this.pc.play(); }, 2000);
                 // console.log("O BACANO ESTÁ A JOGAR SOZINHO ????? 222");
             }
         };
@@ -281,12 +286,11 @@ class nimGame {
                 if (this.board.boardPieces[i] > 0)
                     return false;
             }
-
             return true;
         };
 
         this.endGame = function () {
-            if ((this.moves % 2 == 0 && this.firstPlayer == "player") || (this.moves % 2 != 0 && this.firstPlayer != "player")) {
+            if (gameTurn(this.moves, this.firstPlayer) == "player") {
                 document.getElementById("gameMessages").innerHTML = "<h1>" + username + " won!</h1>";
                 // var tempId = "userTable" + this.dif; 
                 var tdId = document.getElementById("userTable" + this.dif);
@@ -317,6 +321,12 @@ class nimGame {
         };
     }
 }
+function gameTurn(moves, firstPlayer) {
+    if ((moves%2 == 0 && firstPlayer == "player") || (moves%2 != 0 && firstPlayer != "player")) {
+        return "player";
+    }
+    return "pc";
+}
 function buttonLeave() {
     if(confirm("Are you sure you want to give up?")) {
         gamePlaying = false;
@@ -332,7 +342,7 @@ class AI {
     constructor(dif) {
         this.dif = dif;
 
-        this.easyMove = function () {
+        this.easyPlay = function () {
             while (true) {
                 var x = Math.floor(Math.random() * mainGame.board.boardPieces.length);
                 if (mainGame.board.boardPieces[x] > 0) {
@@ -345,16 +355,16 @@ class AI {
             }
         };
 
-        this.hardMove = function () {
+        this.hardPlay = function () {
             for (var i = 0; i < mainGame.board.boardPieces.length; i++) {
                 for (var j = 0; j < mainGame.board.boardPieces[i]; j++) {
-                    var oldValue = mainGame.board.boardPieces[i];
+                    var temp = mainGame.board.boardPieces[i];
                     mainGame.board.boardPieces[i] = j;
                     if (this.xor() != 0) {
-                        mainGame.board.boardPieces[i] = oldValue;
+                        mainGame.board.boardPieces[i] = temp;
                     }
                     else {
-                        mainGame.board.boardPieces[i] = oldValue;
+                        mainGame.board.boardPieces[i] = temp;
                         mainGame.deletePiece(i, j);
 
                         return;
@@ -375,17 +385,17 @@ class AI {
             return value;
         };
 
-        this.move = function () {
+        this.play = function () {
             if (this.dif == "Easy") {
-                this.easyMove();
+                this.easyPlay();
             } else if (this.dif == "Medium") {
-                var randomN = Math.floor(Math.random() * 2);
-                if (randomN == 0)
-                    this.easyMove();
+                var randomN = Math.ceil(Math.random() * 10);
+                if (randomN%2 == 0)
+                    this.easyPlay();
                 else
-                    this.hardMove();
+                    this.hardPlay();
             } else {
-                this.hardMove();
+                this.hardPlay();
             }
         };
     }
@@ -394,46 +404,53 @@ class Piece {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.html = document.createElement("img");
-        this.html.className = "piece";
-        this.html.id = "piece" + x + "|" + y;
-        this.html.src = "piece.png";
+        this.pieceNewDiv = document.createElement("img");
+        this.pieceNewDiv.className = "piece";
+        this.pieceNewDiv.id = "piece x-" + x + "y:" + y;
+        this.pieceNewDiv.src = "piece.png";
 
-        this.html.onmouseover = function () {
-            if (this.className != "pieceDeleted" && ((mainGame.moves % 2 == 0 && mainGame.firstPlayer == "player") || (mainGame.moves % 2 != 0 && mainGame.firstPlayer != "player"))) {
+        this.pieceNewDiv.onmouseover = function () {
+            if (this.className != "pieceDeleted" && gameTurn(mainGame.moves, mainGame.firstPlayer) == "player") {
                 this.className = "pieceHovered";
                 var length = this.id.length;
-                var temp = this.id.indexOf("|");
-                var x = parseInt(this.id.slice(5, temp));
-                var y = parseInt(this.id.slice(temp + 1, length));
-                for (; y < mainGame.board.boardPieces[x]; y++)
-                    document.getElementById("piece" + x + "|" + y).className = "pieceHovered";
+                var tempT = this.id.indexOf("-");
+                var tempP = this.id.indexOf(":");
+                var x = parseInt(this.id.slice(tempT + 1, tempP - 1));
+                var y = parseInt(this.id.slice(tempP + 1, length));
+                for (; y < mainGame.board.boardPieces[x]; y++) {
+                    var tId = "piece x-" + x + "y:" + y;
+                    document.getElementById(tId).className = "pieceHovered";
+                }
             }
         };
 
-        this.html.onmouseleave = function () {
-            if (this.className != "pieceDeleted" && ((mainGame.moves % 2 == 0 && mainGame.firstPlayer == "player") || (mainGame.moves % 2 != 0 && mainGame.firstPlayer != "player"))) {
+        this.pieceNewDiv.onmouseleave = function () {
+            if (this.className != "pieceDeleted" && gameTurn(mainGame.moves, mainGame.firstPlayer) == "player") {
                 this.className = "piece";
                 var length = this.id.length;
-                var temp = this.id.indexOf("|");
-                var x = parseInt(this.id.slice(5, temp));
-                var y = parseInt(this.id.slice(temp + 1, length));
-                for (; y < mainGame.board.boardPieces[x]; y++)
-                    document.getElementById("piece" + x + "|" + y).className = "piece";
+                var tempT = this.id.indexOf("-");
+                var tempP = this.id.indexOf(":");
+                var x = parseInt(this.id.slice(tempT + 1, tempP - 1));
+                var y = parseInt(this.id.slice(tempP + 1, length));
+                for (; y < mainGame.board.boardPieces[x]; y++) {
+                    var tId = "piece x-" + x + "y:" + y;
+                    document.getElementById(tId).className = "piece";
+                }
             }
         };
 
-        this.html.onclick = function () {
-            if (this.className != "pieceDeleted" && ((mainGame.moves % 2 == 0 && mainGame.firstPlayer == "player") || (mainGame.moves % 2 != 0 && mainGame.firstPlayer != "player"))) {
+        this.pieceNewDiv.onclick = function () {
+            if (this.className != "pieceDeleted" && gameTurn(mainGame.moves, mainGame.firstPlayer) == "player") {
                 this.deletePiece();
             }
         };
 
-        this.html.deletePiece = function () {
+        this.pieceNewDiv.deletePiece = function () {
             var length = this.id.length;
-            var temp = this.id.indexOf("|");
-            var x = parseInt(this.id.slice(5, temp));
-            var y = parseInt(this.id.slice(temp + 1, length));
+            var tempT = this.id.indexOf("-");
+            var tempP = this.id.indexOf(":");
+            var x = parseInt(this.id.slice(tempT + 1, tempP-1));
+            var y = parseInt(this.id.slice(tempP + 1, length));
 
             mainGame.deletePiece(x, y);
         };
