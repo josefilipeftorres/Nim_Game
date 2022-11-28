@@ -1,105 +1,15 @@
 var game,size;
 var gamePlaying = false;
-var majorSections = ["intro", "info", "configuration", "game"];
-var confDivs = ["gameForm", "howToPlay", "gameRules", "showTable"];
 
 const host = 'twserver.alunos.dcc.fc.up.pt';
 const port = '8008';
 const url  = 'http://' + host + ':' + port;
-
 
 var user = new User(null, null, '20');
 function User(username, password, group) {
     this.username = username;
     this.password = password;
     this.group = group;
-}
-function loadMainPage(){
-	for(var i=0; i<majorSections.length; i++)
-		document.getElementById(majorSections[i]).style.display = "none";
-
-	document.getElementById("intro").style.display = "flex";
-    document.getElementById("header").style.background = "transparent";
-}
-function showInfo(){
-	for(var i=0; i<majorSections.length; i++)
-		document.getElementById(majorSections[i]).style.display = "none";
-
-	document.getElementById("info").style.display = "flex";
-    document.getElementById("header").style.background = "transparent";
-
-}
-function showGame(){
-	for(var i=0; i<majorSections.length; i++)
-		document.getElementById(majorSections[i]).style.display = "none";
-        
-    document.getElementById("configuration").style.display = "flex";
-	document.getElementById("game").style.display = "flex";
-    document.getElementById("header").style.background = "#5468FF";
-
-    document.getElementById("gameForm").style.display = "block";
-    document.getElementById("howToPlay").style.display = "none";
-    document.getElementById("gameRules").style.display = "none";
-    document.getElementById("showTable").style.display = "none";
-
-}
-function resetTable() {
-    document.getElementById("userTableEasy").innerHTML = "0";
-    document.getElementById("userTableMedium").innerHTML = "0";
-    document.getElementById("userTableHard").innerHTML = "0";
-    document.getElementById("userTableTotal").innerHTML = "0";
-
-    document.getElementById("pcTableEasy").innerHTML = "0";
-    document.getElementById("pcTableMedium").innerHTML = "0";
-    document.getElementById("pcTableHard").innerHTML = "0";
-    document.getElementById("pcTableTotal").innerHTML = "0";
-
-    document.getElementById("gameModeTotalEasy").innerHTML = "0";
-    document.getElementById("gameModeTotalMedium").innerHTML = "0";
-    document.getElementById("gameModeTotalHard").innerHTML = "0";
-    document.getElementById("gameTotal").innerHTML = "0";
-}
-
-function loginBox() {
-    document.getElementById("showLogin").style.display = 'block';
-    document.getElementById("playButton").style.display = 'none';
-}
-// function logIn() {
-    // document.getElementById("welcome").innerHTML = "Welcome, " + user.username + "!";
-    
-    // document.getElementById("showLogin").style.display = 'none';
-    // document.getElementById("buttonCont").style.display = 'inline-block';
-    // document.getElementById("buttonLeave").style.display = 'inline-block';
-    
-    // document.getElementById("gameButton").style.display = 'inline-block';
-    // document.getElementById("buttonLeave").style.display = 'inline-block';
-// }
-
-function logOut() {
-    // if (!username || !password) return;
-    if (confirm("Are you sure you want to leave?")) {
-        username = undefined;
-        password = undefined;
-        loadMainPage();
-        
-        document.getElementById("playButton").style.display = 'inline-block';
-        document.getElementById("welcome").innerHTML = "";
-        document.getElementById("showLogin").style.display ='none';
-        document.getElementById("gameButton").style.display = 'none';
-        document.getElementById("buttonLeave").style.display ='none';
-        document.getElementById("buttonCont").style.display ='none';
-        document.getElementById("classificationButton").style.display = "none";
-        document.getElementById("playAgainButton").style.display = "none";
-        document.getElementById("gameMessages").style.display = "none";
-        document.getElementById("userName").innerHTML = "";
-        resetTable();
-    }
-}
-function contButton() {
-    for(var i=0; i<majorSections.length; i++)
-		document.getElementById(majorSections[i]).style.display = "none";
-
-	document.getElementById("info").style.display = "flex";
 }
 
 function registerButton() {
@@ -160,91 +70,6 @@ function logIn(_user) {
     });
 }
 
-// function join() {
-//     joinData = {
-//         'group': user.group,
-//         'nick': user.username,
-//         'password': user.password
-//     };
-
-//     fetch(url + '/join', {
-//         method: 'POST',
-//         body:   JSON.stringify(joinData)
-//     })
-// }
-
-
-function buttonLeave() {
-    if(confirm("Are you sure you want to give up?"))
-        game.endGame(true);  
-    else return;
-}
-
-function showHTP() {
-    if (document.getElementById("howToPlay").style.display != "none") {
-        document.getElementById("howToPlay").style.display = "none";
-        document.getElementById("gameForm").style.display = "block";
-        return;
-    }
-
-    for(var i=0; i<confDivs.length; i++)
-		document.getElementById(confDivs[i]).style.display = "none";
-
-    
-    document.getElementById("howToPlay").style.display = "block";
-    // document.getElementById("buttonClose").style.visibility = 'visible';
-    // document.getElementById("gameRules").style.display = "none";
-    // document.getElementById("showTable").style.display = "none";
-    // document.getElementById("gameForm").style.display = "none";
-}
-function showGRL() {
-    if (document.getElementById("gameRules").style.display != "none") {
-        document.getElementById("gameRules").style.display = "none";
-        document.getElementById("gameForm").style.display = "block";
-        return;
-    }
-
-    for(var i=0; i<confDivs.length; i++) document.getElementById(confDivs[i]).style.display = "none";
-
-    document.getElementById("gameRules").style.display = "block";
-}
-function showTable() {
-    if (document.getElementById("showTable").style.display != "none") {
-        document.getElementById("showTable").style.display = "none";
-        document.getElementById("gameForm").style.display = "block";
-        return;
-    }
-
-    for(var i=0; i<confDivs.length; i++) document.getElementById(confDivs[i]).style.display = "none";
-
-    document.getElementById("showTable").style.display = "block";
-}
-function closeHTP() {
-    document.getElementById("howToPlay").style.display = "none";
-    // document.getElementById("buttonClose").style.visibility = 'hidden';
-    document.getElementById("gameForm").style.display = "block";
-}
-function closeGRL() {
-    document.getElementById("gameRules").style.display = "none";
-    // document.getElementById("buttonClose").style.visibility = 'hidden';
-    document.getElementById("gameForm").style.display = "block";
-}
-function closeTBL() {
-    document.getElementById("showTable").style.display = "none";
-    // document.getElementById("buttonClose").style.visibility = 'hidden';
-    document.getElementById("gameForm").style.display = "block";
-}
-
-function singlePlayerForm() {
-	document.getElementById("singlePlayerOptions").style.display = "block";
-}
-function multiPlayerForm() {
-    // alert("Sorry but this option is not available.\nPlease choose singleplayer mode if you want to play!");
-
-    // Change later for MultiPlayer Mode
-    // document.getElementById("gameTypeForm").gameOptions[0].checked = true;
-	document.getElementById("singlePlayerOptions").style.display = "none";
-}
 
 function play() {
     const gameType = document.getElementById("gameTypeForm").gameOptions.value;
@@ -256,19 +81,20 @@ function play() {
         var starter  = document.getElementById("startingForm").startingOptions.value;
         size = document.getElementById("boardSizeForm").boardSizeInput.value;
         
-        //verifica se o tamanho do tabuleiro é válido
+        // Verifica se o tamanho do tabuleiro é válido
         if (size%1 != 0 || size <= 0) { // Float or <= 0
-            // console.log(size%1);
             alert("Invalid board size!");
             return;
         }
     
-        //prepara os displays corretamente para o jogo
+        // Prepara os displays corretamente para o jogo
         document.getElementById("classificationButton").style.display = "inline-block";
         document.getElementById("playAgainButton").style.display = "none"; 
         document.getElementById("leaveGame").style.display = "block";
         document.getElementById("gameMessages").style.display = "block";
     
+        document.getElementById("userName").innerHTML = user.username.slice(0,7);
+
         //cria o objeto jogo e começa
         game = new Game(difficulty, starter, size);
         game.begin();
@@ -288,8 +114,18 @@ function join(size) {
     fetch(url + '/join', {
         method: 'POST',
         body:   JSON.stringify(joinData)
-    });
+    })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
 }
+  
+function _join(response) {
+    //console.log(response.game);
+    game.gameID = response.game;
+    //console.log(game.gameID);
+}
+  
+
 
 class createBoardGame {
     constructor(size) {
@@ -334,13 +170,14 @@ class createBoardGame {
 
 //objeto jogo
 class Game {
-    constructor(difficulty, startingPlayer, size) {
+    constructor(difficulty, startingPlayer, size, gameID) {
         this.difficulty = difficulty;
         this.firstPlayer = startingPlayer;
 
         this.board;
         this.moves;
         this.pc;
+        this.gameID;
 
         //jogo começa aqui
         this.begin = function () {
