@@ -1,18 +1,24 @@
 var game,size;
 var gamePlaying = false;
-var username;
-var password;
 var majorSections = ["intro", "info", "configuration", "game"];
 var confDivs = ["gameForm", "howToPlay", "gameRules", "showTable"];
 
+const host = 'twserver.alunos.dcc.fc.up.pt';
+const port = '8008';
+const url  = 'http://' + host + ':' + port;
+
+
+var user = new User(null, null, '20');
+function User(username, password, group) {
+    this.username = username;
+    this.password = password;
+    this.group = group;
+}
 function loadMainPage(){
 	for(var i=0; i<majorSections.length; i++)
 		document.getElementById(majorSections[i]).style.display = "none";
 
 	document.getElementById("intro").style.display = "flex";
-	// document.getElementById("info").style.display = "none";
-	// document.getElementById("configuration").style.display = "none";
-	// document.getElementById("game").style.display = "none";
     document.getElementById("header").style.background = "transparent";
 }
 function showInfo(){
@@ -30,14 +36,13 @@ function showGame(){
     document.getElementById("configuration").style.display = "flex";
 	document.getElementById("game").style.display = "flex";
     document.getElementById("header").style.background = "#5468FF";
-    
+
     document.getElementById("gameForm").style.display = "block";
     document.getElementById("howToPlay").style.display = "none";
     document.getElementById("gameRules").style.display = "none";
     document.getElementById("showTable").style.display = "none";
 
 }
-
 function resetTable() {
     document.getElementById("userTableEasy").innerHTML = "0";
     document.getElementById("userTableMedium").innerHTML = "0";
@@ -59,27 +64,17 @@ function loginBox() {
     document.getElementById("showLogin").style.display = 'block';
     document.getElementById("playButton").style.display = 'none';
 }
-function logIn() {
-    username = document.getElementById("userInput").value;
-	password = document.getElementById("passwordInput").value;
+// function logIn() {
+    // document.getElementById("welcome").innerHTML = "Welcome, " + user.username + "!";
     
-    if (!username || !password) {
-        alert("Fill the username/password camps!");
-    } else {
-        document.getElementById("userInputForm").reset();
-        
-        document.getElementById("welcome").innerHTML = "Welcome, " + username + "!";
+    // document.getElementById("showLogin").style.display = 'none';
+    // document.getElementById("buttonCont").style.display = 'inline-block';
+    // document.getElementById("buttonLeave").style.display = 'inline-block';
+    
+    // document.getElementById("gameButton").style.display = 'inline-block';
+    // document.getElementById("buttonLeave").style.display = 'inline-block';
+// }
 
-        document.getElementById("showLogin").style.display = 'none';
-        document.getElementById("buttonCont").style.display = 'inline-block';
-        document.getElementById("buttonLeave").style.display = 'inline-block';
-        
-        document.getElementById("gameButton").style.display = 'inline-block';
-        document.getElementById("buttonLeave").style.display = 'inline-block';
-
-        document.getElementById("userName").innerHTML = username.slice(0,12);
-    }
-}
 function logOut() {
     // if (!username || !password) return;
     if (confirm("Are you sure you want to leave?")) {
@@ -105,6 +100,84 @@ function contButton() {
 		document.getElementById(majorSections[i]).style.display = "none";
 
 	document.getElementById("info").style.display = "flex";
+}
+
+function registerButton() {
+    document.getElementById("buttonIn").style.display = "none";
+    document.getElementById("registerPara").style.display = "none";
+
+    const button = document.getElementById("registerButton");
+    button.addEventListener('click', () => {
+        const _username = document.getElementById("userInput").value;
+	    const _password = document.getElementById("passwordInput").value;
+    
+        logData = {
+            'nick': _username,
+            'password': _password
+        };
+
+        fetch(url + '/register', {
+            method: 'POST',
+            body: JSON.stringify(logData),
+        })
+        .then(_login);
+    });
+}
+
+function _login(response) {
+    if (response.status >= 200 && response.status < 300) {
+        document.getElementById("buttonIn").style.display = "block";
+        document.getElementById("successMessage").style.display = "block";
+        newUser = new User(document.getElementById("userInput").value, document.getElementById("passwordInput").value);
+        logIn(newUser);
+    } else {
+        alert(response);
+        document.getElementById("userInput").value = "";
+        document.getElementById("passwordInput").value = "";
+        return;
+    }
+}
+
+function logIn(_user) {
+    const logInButton = document.getElementById("buttonIn");
+
+    logInButton.addEventListener('click', () => {
+        if(_user.username == document.getElementById("userInput").value && _user.password == document.getElementById("passwordInput").value) {
+            user.username = _user.username;
+            user.password = _user.password;
+
+            document.getElementById("welcome").innerHTML = "Welcome, " + user.username + "!";
+    
+            document.getElementById("showLogin").style.display = 'none';
+            document.getElementById("buttonCont").style.display = 'inline-block';
+            document.getElementById("buttonLeave").style.display = 'inline-block';
+            
+            document.getElementById("gameButton").style.display = 'inline-block';
+            
+        } else {
+            alert("Error");
+        }
+    });
+}
+
+// function join() {
+//     joinData = {
+//         'group': user.group,
+//         'nick': user.username,
+//         'password': user.password
+//     };
+
+//     fetch(url + '/join', {
+//         method: 'POST',
+//         body:   JSON.stringify(joinData)
+//     })
+// }
+
+
+function buttonLeave() {
+    if(confirm("Are you sure you want to give up?"))
+        game.endGame(true);  
+    else return;
 }
 
 function showHTP() {
@@ -163,44 +236,72 @@ function closeTBL() {
 }
 
 function singlePlayerForm() {
-	document.getElementById("singlePlayerForm").style.display = "block";
+	document.getElementById("singlePlayerOptions").style.display = "block";
 }
 function multiPlayerForm() {
-    alert("Sorry but this option is not available.\nPlease choose singleplayer mode if you want to play!");
+    // alert("Sorry but this option is not available.\nPlease choose singleplayer mode if you want to play!");
 
     // Change later for MultiPlayer Mode
-    document.getElementById("gameTypeForm").gameOptions[0].checked = true;
-	// document.getElementById("singlePlayerForm").style.display = "none";
+    // document.getElementById("gameTypeForm").gameOptions[0].checked = true;
+	document.getElementById("singlePlayerOptions").style.display = "none";
 }
 
 function play() {
-
-    var difficulty  = document.getElementById("difficultyForm").difficultyOptions.value;
-    var starter  = document.getElementById("startingForm").startingOptions.value;
-    size = document.getElementById("boardSizeForm").boardSizeInput.value;
+    const gameType = document.getElementById("gameTypeForm").gameOptions.value;
+    // console.log(gameType);
     
-    if (size%1 != 0 || size <= 0) { // Float or <= 0
-        // console.log(size%1);
-        alert("Invalid board size!");
-        return;
+    if (gameType == "singleplayer") {
+        //recebe valores das configuracoes
+        var difficulty  = document.getElementById("difficultyForm").difficultyOptions.value;
+        var starter  = document.getElementById("startingForm").startingOptions.value;
+        size = document.getElementById("boardSizeForm").boardSizeInput.value;
+        
+        //verifica se o tamanho do tabuleiro é válido
+        if (size%1 != 0 || size <= 0) { // Float or <= 0
+            // console.log(size%1);
+            alert("Invalid board size!");
+            return;
+        }
+    
+        //prepara os displays corretamente para o jogo
+        document.getElementById("classificationButton").style.display = "inline-block";
+        document.getElementById("playAgainButton").style.display = "none"; 
+        document.getElementById("leaveGame").style.display = "block";
+        document.getElementById("gameMessages").style.display = "block";
+    
+        //cria o objeto jogo e começa
+        game = new Game(difficulty, starter, size);
+        game.begin();
+    } else {
+        size = document.getElementById("boardSizeForm").boardSizeInput.value;
+        join(size);
     }
-
-    document.getElementById("classificationButton").style.display = "inline-block";
-    document.getElementById("playAgainButton").style.display = "none"; 
-    document.getElementById("leaveGame").style.display = "block";
-    document.getElementById("gameMessages").style.display = "block";
-
-
-    game = new Game(difficulty, starter, size);
-    game.begin();
+}
+function join(size) {
+    joinData = {
+        'group': user.group,
+        'nick': user.username,
+        'password': user.password,
+        'size': size
+    };
+        
+    fetch(url + '/join', {
+        method: 'POST',
+        body:   JSON.stringify(joinData)
+    });
 }
 
 class createBoardGame {
     constructor(size) {
+        //variavel para guardar a quantidade de peças por linha
         this.boardPieces = [];
         
+        //tamanhos de colunas e linhas
+        //no caso do x nos tentamos fazer a expressão algébrica para que o tabuleiro fosse apenas com números impares no entanto acabamos por não conseguir
         this.xSide = size*2-1;
         this.ySide = size;
+        
+        //boardPlace guarda toda a div do tabuleiro
         this.boardPlace;
 
         this.createBoard = function () {
@@ -211,12 +312,17 @@ class createBoardGame {
             let show = document.getElementById("showGame");
             show.appendChild(this.boardPlace);
 
+            //o for loop aqui serve para criar as linhas do tabuleiro
             for (let i = 0; i < this.ySide; i++) {
+                //e colocamos o numero correto de peças nesssa linha no array
                 this.boardPieces.push(i + 1);
+                //criamos a div que vai conter as peças da linha
                 let tempDiv = document.createElement("div");
+                //damos um indice a essa div
                 tempDiv.id = "row:" + i;
                 tempDiv.className = "cellDiv";
                 for (var j = i; j >= 0; j--) {
+                    //criamos as peças
                     var piece = new Piece(i, j);
                     tempDiv.appendChild(piece.pieceNewDiv);
                 }
@@ -225,6 +331,8 @@ class createBoardGame {
         };
     }
 }
+
+//objeto jogo
 class Game {
     constructor(difficulty, startingPlayer, size) {
         this.difficulty = difficulty;
@@ -234,6 +342,7 @@ class Game {
         this.moves;
         this.pc;
 
+        //jogo começa aqui
         this.begin = function () {
             this.board = new createBoardGame(size);
             this.pc = new AI(this.difficulty);
@@ -241,15 +350,16 @@ class Game {
 
             gamePlaying = true;
 
+            //remove tudo o que existia anteriormente no tabuleiro
             var elem = document.getElementById("showGame");
             while (elem.firstChild) {
                 elem.removeChild(elem.firstChild);
                 // console.log(elem + "| teste");
             }
-
+            //cria o tabuleiro
             this.board.createBoard();
 
-
+            //update as mensagens do jogo
             this.changeGameMessages();
 
             if (this.firstPlayer == "pc") {
@@ -261,30 +371,34 @@ class Game {
             }
 
         };
-
+        //verifica se o jogador pode jogar
         this.validPlayerPlay = function () {
             if((this.moves % 2 == 0 && this.firstPlayer == "player") || (this.moves % 2 != 0 && this.firstPlayer != "player")) {
                 return true;
             }
             return false;
         }
+        //verifica se o pc pode jogar
         this.validPCPlay = function () {
             if((this.moves % 2 == 0 && this.firstPlayer == "pc") || (this.moves % 2 != 0 && this.firstPlayer != "pc")) {
                 return true;
             }
             return false;
         }
+
+        //update das mensagens conforme as funções anteriores
         this.changeGameMessages = function () {
             let gMessage = document.getElementById("gameMessages");
             //console.log("gMessage: " + gMessage);
             if (this.validPlayerPlay()) {
-                gMessage.innerHTML = "<h1>" + username + "'s going to play now!</h1>";
+                gMessage.innerHTML = "<h1>" + user.username + "'s going to play now!</h1>";
             }
             else {
                 gMessage.innerHTML = "<h1>Computer is playing...</h1>";
             }
         };
 
+        //elimina a peça do tabuleiro através do seu indice
         this.deletePiece = function (x, y) {
             for (var i = y; i < this.board.boardPieces[x]; i++) {
                 // var toBeDeleted = document.getElementById("piece x-" + x + " y:" + i);
@@ -293,16 +407,19 @@ class Game {
                 document.getElementById("piece x-" + x + "y:" + i).className = "pieceDeleted";
             }
 
+            //coloca no array o numero de peças que restam
             this.board.boardPieces[x] = y;
             
+            //verifica se o jogo acabou
             if (this.checkGameOver() == true) {
                 this.endGame(false);
                 return;
             }
 
-
+            //incrementa moves que serve para ver os turnos
             this.moves++;
 
+            //atualiza o tabuleiro
             if (gamePlaying == true) this.changeGameMessages();
 
             if (this.validPCPlay() && gamePlaying == true) {
@@ -314,6 +431,7 @@ class Game {
             }
         };
 
+        //percorre array de peças e verifica se esta vazio
         this.checkGameOver = function () {
             for (var i = 0; i < this.board.boardPieces.length; i++) {
                 if (this.board.boardPieces[i] > 0)
@@ -322,9 +440,10 @@ class Game {
             return true;
         };
 
+        //termina o jogo e atualiza as classificações no caso do jogador ter ganho, o pc ter ganho ou jogador desistiu
         this.endGame = function (giveUp) {
             if(giveUp == true) {
-                document.getElementById("gameMessages").innerHTML = "<h1>"+ username + "gave up!<br>The Computer won!</h1>";
+                document.getElementById("gameMessages").innerHTML = "<h1>"+ user.username + " gave up!<br>The Computer won!</h1>";
                 var tdId = document.getElementById("pcTable" + this.difficulty);
                 var modeTotal = document.getElementById("gameModeTotal" + this.difficulty);
                 var total = document.getElementById("pcTableTotal");
@@ -333,7 +452,7 @@ class Game {
                 total.innerHTML = ++total.innerHTML;
             }
             else if ((this.moves % 2 == 0 && this.firstPlayer == "player") || (this.moves % 2 != 0 && this.firstPlayer != "player")) {
-                document.getElementById("gameMessages").innerHTML = "<h1>" + username + " won!</h1>";
+                document.getElementById("gameMessages").innerHTML = "<h1>" + user.username + " won!</h1>";
                 // var tempId = "userTable" + this.difficulty; 
                 var tdId = document.getElementById("userTable" + this.difficulty);
                 var modeTotal = document.getElementById("gameModeTotal" + this.difficulty);
@@ -365,17 +484,11 @@ class Game {
     }
 }
 
-function buttonLeave() {
-    if(confirm("Are you sure you want to give up?")) {
-        game.endGame(true);  
-    }
-    else return;
-}
-
 class AI {
     constructor(difficulty) {
         this.difficulty = difficulty;
 
+        //na easyPlay temos apenas um numero aleatorio entre entre 0 e numero linhas e depois entre esse numero e o numero de peças na linha
         this.easyPlay = function () {
             while (true) {
                 var x = Math.floor(Math.random() * game.board.boardPieces.length);
@@ -434,6 +547,7 @@ class AI {
         };
     }
 }
+
 class Piece {
     constructor(x, y) {
         this.x = x;

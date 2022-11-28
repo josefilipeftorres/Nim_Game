@@ -8,6 +8,7 @@
     <title>Nim game</title>
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <script src="game.js"></script>
+    <!-- <link rel="shortcut icon" href="#"> -->
 </head>
 
 <body onload="loadMainPage()">
@@ -45,6 +46,12 @@
                     <input id="passwordInput" type="password" placeholder="Password" name="password">
                 </form>
                 <button class="button" id="buttonIn" type="submit" onclick="logIn()">Log In</button>
+                <div id="registerForm">
+                    <br>
+                    <p id="registerPara">Don't have an account? Create now</p>
+                    <button id="registerButton" onclick="registerButton()">Register</button>
+                    <p id="successMessage" style="color: rgb(152, 255, 152); display: none;">User created successfully!</p>
+                </div>
             </div>
             <button class="button" id="buttonCont" type="button" onclick="contButton()">Continue</button>
         </div>

@@ -199,6 +199,13 @@ button:active {
 #intro #buttonCont {
     display: none;
 }
+#intro #registerForm {
+    display: block;
+}
+#intro #registerForm #registerButton {
+    margin-top: 0%;
+}
+
 /* ------------------------------------------------------ */
 /* ------------------------------------------------------ */
 /*                  End Intro Section                     */
