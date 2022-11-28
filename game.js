@@ -34,11 +34,11 @@ function registerButton() {
             xhr.open("POST", url + '/register', false);
             xhr.send(JSON.stringify(logData));
     
-            if (xhr.status == 200) {
+            if (xhr.readyState == 4 && xhr.status == 200) {
                 document.getElementById("buttonIn").style.display = "block";
                 document.getElementById("successMessage").style.display = "block";
                 newUser = new User(document.getElementById("userInput").value, document.getElementById("passwordInput").value);
-                logIn(newUser);
+                // logIn(newUser);
             } else {
                 alert(xhr.responseText);
                 document.getElementById("userInputForm").reset();
@@ -126,8 +126,6 @@ function _join(response) {
     //console.log(game.gameID);
 }
   
-
-
 class createBoardGame {
     constructor(size) {
         //variavel para guardar a quantidade de peças por linha
