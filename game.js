@@ -1,9 +1,7 @@
 var game,size;
 var gamePlaying = false;
 
-const host = 'twserver.alunos.dcc.fc.up.pt';
-const port = '8008';
-const url  = 'http://' + host + ':' + port;
+const url = 'http://twserver.alunos.dcc.fc.up.pt:8008'
 
 var user = new User(null, null, '20');
 function User(username, password, group) {
@@ -20,32 +18,35 @@ function registerButton() {
     button.addEventListener('click', () => {
         const _username = document.getElementById("userInput").value;
 	    const _password = document.getElementById("passwordInput").value;
+        
+        if(!_username || !_password) {
+            document.getElementById("messageBox").innerHTML = "Please fill the username/password camps!";
+            return;
+        } else {
+            document.getElementById("messageBox").innerHTML = "";
+            
+            logData = {
+                'nick': _username,
+                'password': _password
+            };
     
-        logData = {
-            'nick': _username,
-            'password': _password
-        };
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", url + '/register', false);
+            xhr.send(JSON.stringify(logData));
+    
+            if (xhr.status == 200) {
+                document.getElementById("buttonIn").style.display = "block";
+                document.getElementById("successMessage").style.display = "block";
+                newUser = new User(document.getElementById("userInput").value, document.getElementById("passwordInput").value);
+                logIn(newUser);
+            } else {
+                alert(xhr.responseText);
+                document.getElementById("userInputForm").reset();
+                return;
+            }
+        }
 
-        fetch(url + '/register', {
-            method: 'POST',
-            body: JSON.stringify(logData),
-        })
-        .then(_login);
     });
-}
-
-function _login(response) {
-    if (response.status >= 200 && response.status < 300) {
-        document.getElementById("buttonIn").style.display = "block";
-        document.getElementById("successMessage").style.display = "block";
-        newUser = new User(document.getElementById("userInput").value, document.getElementById("passwordInput").value);
-        logIn(newUser);
-    } else {
-        alert(response);
-        document.getElementById("userInput").value = "";
-        document.getElementById("passwordInput").value = "";
-        return;
-    }
 }
 
 function logIn(_user) {

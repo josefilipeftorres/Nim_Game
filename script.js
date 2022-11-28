@@ -134,7 +134,6 @@ function buttonLeave() {
     else return;
 }
 
-
 var buttonDiv = ["playButton", "gameButton", "buttonLeave", "buttonCont", 
 				 "classificationButton", "playAgainButton"]
 function logOut() {
