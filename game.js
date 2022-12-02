@@ -1,7 +1,7 @@
 var game,size;
 var gamePlaying = false;
 
-const url = 'http://twserver.alunos.dcc.fc.up.pt:8008'
+const url = 'http://twserver.alunos.dcc.fc.up.pt:8008/';
 
 var user = new User(null, null, '20');
 function User(username, password, group) {
@@ -25,27 +25,35 @@ function registerButton() {
         } else {
             document.getElementById("messageBox").innerHTML = "";
             
-            logData = {
+            const logData = {
                 'nick': _username,
                 'password': _password
             };
-    
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", url + '/register', false);
-            xhr.send(JSON.stringify(logData));
-    
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                document.getElementById("buttonIn").style.display = "block";
-                document.getElementById("successMessage").style.display = "block";
-                newUser = new User(document.getElementById("userInput").value, document.getElementById("passwordInput").value);
-                // logIn(newUser);
-            } else {
-                alert(xhr.responseText);
-                document.getElementById("userInputForm").reset();
-                return;
-            }
-        }
+            const logDatajson = JSON.stringify(logData);
 
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", url + 'register', true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    // if(response.status == 'ok') {                // Com isto dá os erros que o professor queria, mas dá erro no login
+                        document.getElementById("buttonIn").style.display = "block";
+
+                        const mBox = document.getElementById("messageBox");
+                        mBox.innerHTML = "User registered!";
+                        mBox.style.color = "#98ff98";
+
+                        var newUser = new User(_username, _password, '20');
+                        logIn(newUser);
+                    } else {
+                        document.getElementById("messageBox").innerHTML = "User already exists!";
+                        document.getElementById("userInputForm").reset();
+                    // }
+                }
+            }
+            xhr.send(logDatajson);
+        }
     });
 }
 
@@ -76,17 +84,17 @@ function play() {
     const gameType = document.getElementById("gameTypeForm").gameOptions.value;
     // console.log(gameType);
     
+    const size = document.getElementById("boardSizeForm").boardSizeInput.value;
+    if (size % 1 != 0 || size <= 0) {   // Verificar se é inteiro
+        alert("Please insert a valid board size!");
+        return;
+    }
+
     if (gameType == "singleplayer") {
         //recebe valores das configuracoes
         var difficulty  = document.getElementById("difficultyForm").difficultyOptions.value;
         var starter  = document.getElementById("startingForm").startingOptions.value;
-        size = document.getElementById("boardSizeForm").boardSizeInput.value;
-        
-        // Verifica se o tamanho do tabuleiro é válido
-        if (size%1 != 0 || size <= 0) { // Float or <= 0
-            alert("Invalid board size!");
-            return;
-        }
+        // size = document.getElementById("boardSizeForm").boardSizeInput.value;
     
         // Prepara os displays corretamente para o jogo
         document.getElementById("classificationButton").style.display = "inline-block";
@@ -100,30 +108,99 @@ function play() {
         game = new Game(difficulty, starter, size);
         game.begin();
     } else {
-        size = document.getElementById("boardSizeForm").boardSizeInput.value;
+        resetGame();
         join(size);
     }
 }
 function join(size) {
-    joinData = {
+    const joinData = {
         'group': user.group,
         'nick': user.username,
         'password': user.password,
         'size': size
     };
-        
-    fetch(url + '/join', {
-        method: 'POST',
-        body:   JSON.stringify(joinData)
-    })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
+    const joinDatajson = JSON.stringify(joinData);
+    
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url + 'join', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            const response = JSON.parse(xhr.responseText)['game'];
+            // console.log(response);
+            
+            initiateEventSource(response);
+
+            const gameMessages = document.getElementById("gameMessages");
+            gameMessages.innerHTML = "Waiting for another player to join...";
+
+            // Create a button to leave the queue
+
+            gamePlaying = true;
+            game = new onlineGame(response, size); // criar onlineGame
+            game.begin();
+
+        }
+        // else {
+        //     alert("Error");
+        // }
+    }
+    xhr.send(joinDatajson);
 }
-  
-function _join(response) {
-    //console.log(response.game);
-    game.gameID = response.game;
-    //console.log(game.gameID);
+
+function initiateEventSource(gameId) {
+    var eventSource = new EventSource(url + 'update?nick=' + user.username + "&game=" + gameId);
+    
+    eventSource.onmessage = function(event) {
+        var response = JSON.parse(event.data);
+        console.log(response);
+
+        if(response["turn"] != null) {  // Se for a vez do jogador
+            if (response["stack"] != null) { 
+                const x = response["stack"];
+                const y = response["piece"];
+
+                game.deletePiece(x, y);
+                game.turn = response["turn"];
+                game.updateMessages();
+
+                if (game.turn == user.username) {
+                    game.setTimer();
+                } else {
+                    game.clearTimer();
+                    document.getElementById("timerP2").innerHTML = "02:00"; 
+                }
+            }
+        } else if (response["winner"] != null) { // Se o jogo acabou
+            gamePlaying = false;
+            game.endGame(response["winner"]);
+        } else if (response["error"]) { // Se houve um erro
+            if (response["error"] == "Invalid game reference") {
+                resetTimeout(timeOutMessage);
+                document.getElementById("gameMessages").innerHTML = "Error! Invalid game reference.";
+            } else {
+                clearTimeout(timeOutMessage);
+                document.getElementById("gameMessages").innerHTML = "Error! " + response["error"];
+            }
+        } else if (response["winner"] == null) {
+            if (timerLeft == 0) {   // Se o tempo acabou
+                setTimeout(function() {
+                    gamePlaying = false;
+                    game.endGame("timeout");
+                    eventSource.close();
+                }, 2000);
+            } else {
+                gamePlaying = false;
+                eventSource.close();
+            }
+        }
+    }
+}
+
+function resetGame() {
+    const gameDiv = document.getElementById("showGame");
+    while (gameDiv.firstChild) {
+        gameDiv.removeChild(gameDiv.firstChild);
+    }
 }
   
 class createBoardGame {
@@ -199,11 +276,7 @@ class Game {
             this.changeGameMessages();
 
             if (this.firstPlayer == "pc") {
-                // setTimeout(function() {this.pc.play(); }, 1500);
                 setTimeout(() => { this.pc.play(); }, 2000);
-                // this.firstPlayer = "player";
-                // console.log("O BACANO ESTÁ A JOGAR SOZINHO ?????");
-                // console.log("Posso jogar agora??");
             }
 
         };
@@ -237,9 +310,6 @@ class Game {
         //elimina a peça do tabuleiro através do seu indice
         this.deletePiece = function (x, y) {
             for (var i = y; i < this.board.boardPieces[x]; i++) {
-                // var toBeDeleted = document.getElementById("piece x-" + x + " y:" + i);
-                // toBeDeleted.className = "pieceDeleted";
-                // toBeDeleted.style.visibility = "hidden";
                 document.getElementById("piece x-" + x + "y:" + i).className = "pieceDeleted";
             }
 
@@ -259,11 +329,7 @@ class Game {
             if (gamePlaying == true) this.changeGameMessages();
 
             if (this.validPCPlay() && gamePlaying == true) {
-                // console.log("pc move TESTE");
-                // if (this.firstPlayer == "pc") {
-                // console.log("pc move TESTE AFTER IF");
                 setTimeout(() => { this.pc.play(); }, 2000);
-                // console.log("ESTÁ A JOGAR SOZINHO ????? 222");
             }
         };
 
@@ -294,8 +360,7 @@ class Game {
                 var modeTotal = document.getElementById("gameModeTotal" + this.difficulty);
                 var total = document.getElementById("userTableTotal");
                 
-                // console.log(tdId);
-                // var val = ++tdId.innerHTML;
+
                 tdId.innerHTML = ++tdId.innerHTML;
                 modeTotal.innerHTML = ++modeTotal.innerHTML;
                 total.innerHTML = ++total.innerHTML;
@@ -324,7 +389,6 @@ class AI {
     constructor(difficulty) {
         this.difficulty = difficulty;
 
-        //na easyPlay temos apenas um numero aleatorio entre entre 0 e numero linhas e depois entre esse numero e o numero de peças na linha
         this.easyPlay = function () {
             while (true) {
                 var x = Math.floor(Math.random() * game.board.boardPieces.length);

@@ -8,6 +8,7 @@ function loadMainPage(){
 
 	document.getElementById("intro").style.display = "flex";
     document.getElementById("header").style.background = "transparent";
+    document.getElementById("userInputForm").reset();
 }
 
 function showInfo(){
@@ -151,6 +152,7 @@ function logOut() {
         document.getElementById("gameMessages").style.display = "none";
         document.getElementById("welcome").innerHTML = "";
         document.getElementById("userName").innerHTML = "";
+        document.getElementById("messageBox").innerHTML = "";
         resetTable();
     }
 }
