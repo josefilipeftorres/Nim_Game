@@ -34,10 +34,10 @@ function showGame(){
 }
 
 // Login Div
-function loginBox() {
-    document.getElementById("showLogin").style.display = 'block';
-    document.getElementById("playButton").style.display = 'none';
-}
+// function loginBox() {
+//     document.getElementById("showLogin").style.display = 'block';
+//     // document.getElementById("playButton").style.display = 'none';
+// }
 
 // function logIn() {
     // document.getElementById("welcome").innerHTML = "Welcome, " + user.username + "!";
@@ -57,7 +57,7 @@ var classTableDiv = ["userTableEasy", "userTableMedium", "userTableHard", "userT
 					]
 function resetTable() {
 	for(var i = 0; i < classTableDiv.length; i++)
-		document.getElementById(classTableDiv).innerHTML = "0";
+		document.getElementById(classTableDiv[i]).innerHTML = "0";
 }
 
 // HowToPlay, GameRules, ClassTable - Game DIV
@@ -135,7 +135,7 @@ function buttonLeave() {
     else return;
 }
 
-var buttonDiv = ["playButton", "gameButton", "buttonLeave", "buttonCont", 
+var buttonDiv = ["gameButton", "buttonLeave", "buttonCont", 
 				 "classificationButton", "playAgainButton"]
 function logOut() {
     if (confirm("Are you sure you want to leave?")) {
@@ -146,13 +146,18 @@ function logOut() {
 		for (var i = 0; i < buttonDiv.length; i++)
 			document.getElementById(buttonDiv[i]).style.display = "none"
 		
-		document.getElementById("playButton").style.display = 'inline-block';
-
-        document.getElementById("showLogin").style.display ='none';
+        document.getElementById("showLogin").style.display ='block';
         document.getElementById("gameMessages").style.display = "none";
         document.getElementById("welcome").innerHTML = "";
         document.getElementById("userName").innerHTML = "";
         document.getElementById("messageBox").innerHTML = "";
         resetTable();
     }
+}
+
+function logBackPage() {
+    document.getElementById("showLogin").style.display = "block";
+    document.getElementById("buttonIn").style.display = "block";
+    document.getElementById("registerPara").style.display = "block";
+    document.getElementById("logBackPage").style.display = "none";
 }

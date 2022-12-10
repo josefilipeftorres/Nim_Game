@@ -180,7 +180,8 @@ button:active {
 #intro #showLogin {
     margin-top: 10px;
     color: white;   
-    display: none;
+    /* display: none; */
+    display: block;
 }
 #userInput{
 	float: left;
@@ -204,6 +205,9 @@ button:active {
 }
 #intro #registerForm #registerButton {
     margin-top: 0%;
+}
+#intro #logBackPage {
+    display: none;
 }
 
 /* ------------------------------------------------------ */

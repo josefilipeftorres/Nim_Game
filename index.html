@@ -9,7 +9,9 @@
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <script src="game.js"></script>
     <script src="script.js"></script>
-    <!-- <link rel="shortcut icon" href="#"> -->
+    <script src="log.js"></script>
+    <script src="gamePlay.js"></script>
+    <link rel="shortcut icon" href="#">
 </head>
 
 <body onload="loadMainPage()">
@@ -40,6 +42,22 @@
         <div class="apr">
             <h1>Welcome to<span></span></h1>
             <h1 class="hover-underline">N!M Game<span></span></h1>
+            
+            <div id="showLogin">
+                <form id="userInputForm">
+                    <input id="userInput" type="text" placeholder="Username" name="username">
+                    <input id="passwordInput" type="password" placeholder="Password" name="password">
+                </form>
+                <button class="button" id="buttonIn" type="submit" onclick="logIn()">Log In</button>
+                <div id="registerForm">
+                    <br>
+                    <p id="registerPara">Don't have an account? Create one now</p>
+                    <button id="registerButton" onclick="registerButton()">Register</button>
+                    <p id="messageBox"></p>
+                </div>
+                <button id="logBackPage" style="display: none;" onclick="logBackPage()">Go Back</button>
+            </div>
+            <!--
             <button type="button" id="playButton" onclick="loginBox()">Play</button>
             <div id="showLogin">
                 <form id="userInputForm">
@@ -54,6 +72,7 @@
                     <p id="messageBox"></p>
                 </div>
             </div>
+            -->
             <button class="button" id="buttonCont" type="button" onclick="contButton()">Continue</button>
         </div>
     </div>
@@ -71,7 +90,7 @@
                 <br>
                 <p>It's played in turns and each player has to take one or more pieces from one of the piles.</p>
                 <br>
-                <p>The game objective is to be last player to take the last piece of the board.</p>
+                <p>The game objective is to be the last player to take the last piece of the board.</p>
                 <br>
                 <p>If you want to play, log in first on <i>"Home"</i> page!</p>
                 <br>
@@ -186,6 +205,7 @@
             <button class="buttonClose" type="button" onclick="closeTBL()">Close</button>
         </div>
 
+        <div id="timer"></div>
         <div id="gameMessages"></div>
 
         <div id="playAgain">
