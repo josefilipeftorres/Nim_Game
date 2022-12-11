@@ -83,7 +83,7 @@ button:active {
   	display: inline-block;
   	position: absolute;
   	top: 50%;
-  	left: 50%;
+  	left: 45%;
   	transform: translate(-50%,-50%);
   	min-width: 550px;
     margin-left: 45%;
@@ -110,7 +110,7 @@ button:active {
     color: white;
     margin-left: 10px;
 }
-#header #buttonLeave, #gameButton {
+#header #buttonLeave, #gameButton, #onlineRanks {
     display: none;
 }
 #header button{
@@ -259,6 +259,29 @@ button:active {
 #info img {
     width: 15%;
     height: 15%;
+}
+
+#onlineRanksDiv {
+    display: none;
+}
+
+#onlineRanksDiv .container{
+    text-align: center;
+    display: flex;
+}
+
+#onlineRanksTable table, th, td{
+    margin: 0 auto;
+    width: 50%;
+    border: 1px solid black;
+    border-collapse: collapse;
+    font-size: 1.4rem;
+    color: #ffffff;
+}
+
+#onlineRanksTable th, td {
+    padding: 5px;
+    text-align: left;
 }
 /* ------------------------------------------------------ */
 /* ------------------------------------------------------ */

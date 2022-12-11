@@ -26,6 +26,7 @@
             <ul class="buttonList">
                 <li class="buttonList" onclick="loadMainPage()"><a>Home</a></li>
                 <li class="buttonList" onclick="showInfo()"><a>Info</a></li>
+                <li class="buttonList" onclick="showOnlineRanks()"><a id="onlineRanks">Online Ranks</a></li>
                 <li class="buttonList" onclick="showGame()"><a id="gameButton">Game</a></li>
                 <li class="buttonList"><button type="button" id="buttonLeave" onclick="logOut()">Leave</button></li>
             </ul>
@@ -49,13 +50,14 @@
                     <input id="passwordInput" type="password" placeholder="Password" name="password">
                 </form>
                 <button class="button" id="buttonIn" type="submit" onclick="logIn()">Log In</button>
-                <div id="registerForm">
+                <p>Don't have an account? We create one when you log in!</p>
+                <p id="messageBox"></p>
+                <!-- <div id="registerForm">
                     <br>
                     <p id="registerPara">Don't have an account? Create one now</p>
                     <button id="registerButton" onclick="registerButton()">Register</button>
-                    <p id="messageBox"></p>
                 </div>
-                <button id="logBackPage" style="display: none;" onclick="logBackPage()">Go Back</button>
+                <button id="logBackPage" style="display: none;" onclick="logBackPage()">Go Back</button> -->
             </div>
             <!--
             <button type="button" id="playButton" onclick="loginBox()">Play</button>
@@ -218,6 +220,19 @@
 
     <div id="game">
         <div id="showGame"></div>
+    </div>
+
+    <div id="onlineRanksDiv">
+        <div class="onlineRanksDiv container">
+            <table id="onlineRanksTable" >
+                <!-- <tr>
+                    <th>Player</th>
+                    <th>Games</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                </tr> -->
+            </table> 
+        </div>
     </div>
 </body>
 </html>

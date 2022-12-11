@@ -1,4 +1,4 @@
-var majorSections = ["intro", "info", "configuration", "game"];
+var majorSections = ["intro", "info", "configuration", "game", "onlineRanksDiv"];
 var confDivs = ["gameForm", "howToPlay", "gameRules", "showTable"];
 
 // Major Divs
@@ -130,9 +130,26 @@ function contButton() {
 }
 
 function buttonLeave() {
-    if(confirm("Are you sure you want to give up?"))
-        game.endGame(true);  
-    else return;
+    if (gameType == 0) {
+        if(confirm("Are you sure you want to give up?"))
+            game.endGame(true);  
+        else 
+            return;
+    }
+    else {
+        game.leaveGame();
+    }
+    // if (gamePlaying == true) {
+    //     if(confirm("Are you sure you want to give up?"))
+    //         game.endGame(true);  
+    //     else 
+    //         return;
+    // } else {
+    //     if(confirm("Are you sure you want to leave?"))
+    //         game.endGame("leaveQueue");
+    //     else 
+    //         return;
+    // } 
 }
 
 var buttonDiv = ["gameButton", "buttonLeave", "buttonCont", 
@@ -151,6 +168,7 @@ function logOut() {
         document.getElementById("welcome").innerHTML = "";
         document.getElementById("userName").innerHTML = "";
         document.getElementById("messageBox").innerHTML = "";
+        document.getElementById("onlineRanks").style.display = "none";
         resetTable();
     }
 }
@@ -160,4 +178,50 @@ function logBackPage() {
     document.getElementById("buttonIn").style.display = "block";
     document.getElementById("registerPara").style.display = "block";
     document.getElementById("logBackPage").style.display = "none";
+}
+
+function showOnlineRanks() {
+    for(var i=0; i<majorSections.length; i++)
+		document.getElementById(majorSections[i]).style.display = "none";
+
+    document.getElementById("header").style.background = "transparent";
+    document.getElementById("onlineRanksDiv").style.display = "block";
+
+    const rankingData = {
+        "group": group,
+        "size": 4
+    }
+    const rankingDataJSON = JSON.stringify(rankingData);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url + "ranking", true);
+
+    var tb = "<tr>" +
+                "<th>Player</th>" +
+                "<th>Games</th>" +
+                "<th>Wins</th>" +
+                "<th>Losses</th>" +
+            "</tr>";
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText)["ranking"];
+            if (response != null) {
+                for (var i = 0; i < response.length; i++) {
+                    tb += "<tr>";
+                    tb += "<td>" + response[i]["nick"] + "</td>";
+                    tb += "<td>" + response[i]["games"] + "</td>";
+                    tb += "<td>" + response[i]["victories"] + "</td>";
+                    tb += "<td>" + (response[i]["games"] - response[i]["victories"]) + "</td>";
+                    tb += "</tr>";
+                    
+                    // var obj = document.createElement("tr");
+                    // obj.innerHTML = tb;
+                    // document.getElementById("onlineRanksTable").appendChild(obj);
+                }
+            }
+            document.getElementById("onlineRanksTable").innerHTML = tb;
+        }
+    }
+    xhr.send(rankingDataJSON);
 }

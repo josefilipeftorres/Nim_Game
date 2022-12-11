@@ -320,10 +320,10 @@ class onlineGame {
             this.board = new createBoardGame(this.size);
             this.board.createBoard();
 
-
+            gamePlaying = true;
             this.turn = firstPlayer;
             this.changeGameMessages();
-
+            document.getElementById("timer").style.display = "block";
         };
 
         this.changeGameMessages = function() {
@@ -376,12 +376,36 @@ class onlineGame {
         };
 
         this.endGame = function (winner) {
+
+            const gameMessages = document.getElementById("gameMessages");
+            const leaveGameButton = document.getElementById("leaveGame");
+            const playAgainButton = document.getElementById("playAgainButton");
+            const timerDiv = document.getElementById("timer");
+
             gamePlaying = false;
-        
-            document.getElementById("gameMessages").innerHTML = "The Game is Over! Congratulations " + winner + " won!"; 
-            document.getElementById("leaveGame").style.display = "none";
-            document.getElementById("playAgainButton").style.display = "inline-block";
-            document.getElementById("timer").style.display = "none";
+            
+            if (winner == 'leaveQueue') {
+                leaveGameButton.style.display = "none";
+                playAgainButton.style.display = "inline-block";
+                timerDiv.style.display = "none";
+                clearTimeout(timer);
+                eventSource.close();
+                return;
+            }
+
+            if (winner == 'timeout') {
+                gameMessages.innerHTML = "No player found to join the game!";
+                leaveGameButton.style.display = "none";
+                // playAgainButton.style.display = "inline-block";
+                timerDiv.style.display = "none";
+            }
+            else {
+                gameMessages.innerHTML = "The Game is Over! Congratulations " + winner + " won!";
+                leaveGameButton.style.display = "none";
+                // playAgainButton.style.display = "inline-block";
+                timerDiv.style.display = "none";
+            }
+            resetGame();
             clearTimeout(timer);
             eventSource.close();
         };
@@ -400,7 +424,8 @@ class onlineGame {
             xhr.onreadystatechange = function() {
                 if (xhr.status == 400) {
                     clearTimeout(timeOutMessage);
-                    document.getElementById("gameMessages").innerHTML = "Error! Bad Request.";
+                    game.endGame('leaveQueue');
+                    // document.getElementById("gameMessages").innerHTML = "Error! Bad Request.";
                 }
             }
             xhr.send(leaveDatajson);

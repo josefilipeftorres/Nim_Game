@@ -55,23 +55,20 @@ function join(size) {
             // console.log(response);
             
             initiateEventSource(response);
-            gamePlaying = true;
+
+            // gamePlaying = true;
 
             const gameMessages = document.getElementById("gameMessages");
             gameMessages.innerHTML = "Waiting for another player to join...";
-
-            // Create a button to leave the queue
-
+            
             game = new onlineGame(response, size); 
-            // game.begin(username);
+
+            document.getElementById("leaveGame").style.display = "block";
         }
         else if (xhr.status == 400) {
             const response = JSON.parse(xhr.responseText);
             const gameMessages = document.getElementById("gameMessages");
-            if (response["error"] == "Invalid size")
-                gameMessages.innerHTML = "Invalid size";
-            else 
-                gameMessages.innerHTML = "You need another player to join";
+            gameMessages.innerHTML = response["error"];
         }
     }
     xhr.send(joinDatajson);
@@ -84,18 +81,14 @@ function setTimer() {
         var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
 		var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-        // Criar div para timer
         document.getElementById("timer").innerHTML = minutes + ":" + seconds;
-
+        
         if (timeLeft <= 0) {
             clearInterval(timer);
-            document.getElementById("gameMessages").innerHTML = "Time to find an opponent has expired";
 
             document.getElementById("leaveGame").style.display = "none";
             document.getElementById("playAgainButton").style.display = "inline-block";
 
-            // if (document.getElementById("showGame") != null)
-            //     document.getElementById("showGame").style.display = "none";
             gamePlaying = false;
             game.leaveGame();
         }
@@ -147,7 +140,7 @@ function initiateEventSource(gameId) {
                     gamePlaying = false;
                     game.endGame("timeout");
                     eventSource.close();
-                }, 3000);
+                }, 2000);
             } else {
                 gamePlaying = false;
                 eventSource.close();
