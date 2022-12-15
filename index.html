@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <script src="game.js"></script>
     <script src="script.js"></script>
-    <script src="log.js"></script>
-    <script src="gamePlay.js"></script>
     <link rel="shortcut icon" href="#">
 </head>
 
@@ -224,6 +222,8 @@
 
     <div id="onlineRanksDiv">
         <div class="onlineRanksDiv container">
+            <input type="number" id="onlineRanksInput" placeholder="Size of the games to search">
+            <button type="button" id="onlineRanksButton" onclick="getOnlineRanks()">Search</button>
             <table id="onlineRanksTable" >
                 <!-- <tr>
                     <th>Player</th>

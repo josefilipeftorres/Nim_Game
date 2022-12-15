@@ -186,42 +186,4 @@ function showOnlineRanks() {
 
     document.getElementById("header").style.background = "transparent";
     document.getElementById("onlineRanksDiv").style.display = "block";
-
-    const rankingData = {
-        "group": group,
-        "size": 4
-    }
-    const rankingDataJSON = JSON.stringify(rankingData);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", url + "ranking", true);
-
-    var tb = "<tr>" +
-                "<th>Player</th>" +
-                "<th>Games</th>" +
-                "<th>Wins</th>" +
-                "<th>Losses</th>" +
-            "</tr>";
-
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            var response = JSON.parse(xhr.responseText)["ranking"];
-            if (response != null) {
-                for (var i = 0; i < response.length; i++) {
-                    tb += "<tr>";
-                    tb += "<td>" + response[i]["nick"] + "</td>";
-                    tb += "<td>" + response[i]["games"] + "</td>";
-                    tb += "<td>" + response[i]["victories"] + "</td>";
-                    tb += "<td>" + (response[i]["games"] - response[i]["victories"]) + "</td>";
-                    tb += "</tr>";
-                    
-                    // var obj = document.createElement("tr");
-                    // obj.innerHTML = tb;
-                    // document.getElementById("onlineRanksTable").appendChild(obj);
-                }
-            }
-            document.getElementById("onlineRanksTable").innerHTML = tb;
-        }
-    }
-    xhr.send(rankingDataJSON);
 }
